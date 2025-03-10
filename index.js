@@ -100,8 +100,8 @@ const agreementCheckbox = document.querySelector("#data_agreement");
 
 const BACKEND_URL = "https://fog-back-key4.onrender.com"; 
 
-// ✅ EmailJS Credentials
-const EMAILJS_SERVICE_ID = "service_0fr6bes";
+// ✅ Updated EmailJS Credentials
+const EMAILJS_SERVICE_ID = "service_ufzg759";  // 🔹 Updated Service ID
 const EMAILJS_TEMPLATE_ID = "template_krmeczq";
 const EMAILJS_PUBLIC_KEY = "AfUVgE7ii92j3o6lP";
 
