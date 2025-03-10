@@ -127,16 +127,7 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-// ✅ Reset Form
-function resetForm() {
-  nameInput.value = "";
-  emailInput.value = "";
-  messageInput.value = "";
-  agreementCheckbox.checked = false;
-  grecaptcha.reset();
-}
-
-// ✅ Validate Inputs
+// ✅ Validate Inputs **STRICTLY**
 function validateInputs() {
   let errors = [];
 
@@ -148,7 +139,7 @@ function validateInputs() {
 
   if (errors.length > 0) {
     showMessage(errors.join(" "), false);
-    return false;
+    return false; // 🚨 Stop execution if validation fails
   }
   return true;
 }
@@ -162,21 +153,22 @@ function ensureRecaptchaLoaded() {
   return true;
 }
 
-// ✅ Handle Form Submission with Invisible reCAPTCHA
+// ✅ Handle Form Submission with **Strict Validation**
 contactForm.addEventListener("submit", function (e) {
   e.preventDefault();
 
-  // 🔴 First, strictly validate all input fields
+  // 🚨 **VALIDATION FIRST: Prevent blank submissions**
   if (!validateInputs()) {
-    return; // 🚫 Stop here if validation fails
+    console.log("🚫 Form validation failed. Fix errors and try again.");
+    return; // ❌ STOP FORM FROM BEING SENT
   }
 
-  // 🔴 Ensure reCAPTCHA is loaded before proceeding
+  // 🚨 **Ensure reCAPTCHA is loaded before executing**
   if (!ensureRecaptchaLoaded()) {
     return;
   }
 
-  // ✅ If validation passes, trigger reCAPTCHA
+  // ✅ If everything is valid, trigger reCAPTCHA
   grecaptcha.execute("6LcjBPAqAAAAAKKz-7U791WtW5lgHUisYZe2Tr0k", { action: "submit" })
     .then(token => {
       console.log("✅ reCAPTCHA Token:", token);
@@ -188,7 +180,7 @@ contactForm.addEventListener("submit", function (e) {
     });
 });
 
-// ✅ Function to process form submission
+// ✅ Function to process form submission **only if validation & reCAPTCHA pass**
 async function sendFormData(token) {
   console.log("📤 Sending form data with reCAPTCHA token:", token);
 
@@ -207,10 +199,10 @@ async function sendFormData(token) {
       console.error("❌ reCAPTCHA verification failed:", recaptchaData.details);
       showMessage("❌ reCAPTCHA verification failed. Please try again.", false);
       grecaptcha.reset();
-      return;
+      return; // ❌ STOP HERE IF reCAPTCHA FAILS
     }
 
-    // ✅ Send Email via EmailJS after reCAPTCHA success
+    // ✅ Send Email via EmailJS after reCAPTCHA **AND validation** pass
     console.log("📧 Sending email via EmailJS...");
 
     const emailResponse = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
@@ -221,7 +213,14 @@ async function sendFormData(token) {
 
     console.log("✅ EmailJS Response:", emailResponse);
     showMessage("✅ Message sent successfully!", true);
-    resetForm();
+    
+    // ✅ Reset the form after successful submission
+    nameInput.value = "";
+    emailInput.value = "";
+    messageInput.value = "";
+    agreementCheckbox.checked = false;
+    grecaptcha.reset();
+    
   } catch (error) {
     console.error("❌ Error Sending Message:", error);
     showMessage("❌ Something went wrong. Please try again later.", false);
