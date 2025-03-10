@@ -97,7 +97,7 @@ const nameInput = document.querySelector("#user_name");
 const emailInput = document.querySelector("#user_email");
 const messageInput = document.querySelector("#message");
 const agreementCheckbox = document.querySelector("#data_agreement");
-const messageBox = document.createElement("p");  // ✅ Message display element
+const messageBox = document.createElement("p"); // ✅ Message display element
 
 const BACKEND_URL = "https://fog-back-key4.onrender.com"; 
 
