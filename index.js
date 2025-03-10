@@ -169,8 +169,10 @@ contactForm.addEventListener("submit", function (e) {
 async function onSubmit(token) {
   console.log("✅ reCAPTCHA Token Received:", token);
 
-  if (!token) {
-    alert("❌ reCAPTCHA verification failed.");
+  if (!token || token.trim() === "") {
+    console.error("❌ reCAPTCHA token is missing or empty.");
+    alert("❌ reCAPTCHA verification failed. Please refresh the page and try again.");
+    grecaptcha.reset();
     return;
   }
 
