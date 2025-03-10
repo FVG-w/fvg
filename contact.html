@@ -125,7 +125,7 @@
                     </label>
                   </div>
                   <!-- Submit Button -->
-                  <button type="submit" class="g-recaptcha" data-sitekey="6LentO8qAAAAANLoUAGwunqgDCaOti_uY1tT5Ovt" data-callback="onSubmit" aria-label="Send your message to Prospera Consulting">Send Message</button>
+                  <button type="submit" class="g-recaptcha" data-sitekey="6LentO8qAAAAANLoUAGwunqgDCaOti_uY1tT5Ovt" data-callback="onSubmit"   data-size="invisible" aria-label="Send your message to Prospera Consulting">Send Message</button>
                 </form>
               </div>
             </div>
@@ -178,11 +178,11 @@
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script>
       function onSubmit(token) {
-        document.getElementById("contact-form").submit();
+        sendFormData(token);
       }
     </script>
-    <script src="index.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script>emailjs.init("LwJGbn2MCz-gaWOZr");</script> 
+    <script src="index.js"></script>
   </body>
 </html>

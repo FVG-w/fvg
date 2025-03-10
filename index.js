@@ -7,24 +7,40 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function enableTrackingScripts() {
     if (localStorage.getItem("cookieConsent") === "accepted") {
-      const gtagScript = document.createElement("script");
-      gtagScript.src = "https://www.googletagmanager.com/gtag/js?id=G-9JET0VYD3C";
-      gtagScript.async = true;
-      document.head.appendChild(gtagScript);
+      console.log("✅ Tracking cookies enabled");
 
-      const inlineScript = document.createElement("script");
-      inlineScript.innerHTML = `
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-9JET0VYD3C', { 'anonymize_ip': true });
-      `;
-      document.head.appendChild(inlineScript);
+      // ✅ Google Analytics Script
+      if (!document.getElementById("gtag-script")) {
+        const gtagScript = document.createElement("script");
+        gtagScript.id = "gtag-script";
+        gtagScript.src = "https://www.googletagmanager.com/gtag/js?id=G-9JET0VYD3C";
+        gtagScript.async = true;
+        document.head.appendChild(gtagScript);
+  
+        const inlineScript = document.createElement("script");
+        inlineScript.id = "gtag-inline";
+        inlineScript.innerHTML = `
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-9JET0VYD3C', { 'anonymize_ip': true });
+        `;
+        document.head.appendChild(inlineScript);
+      }
     }
   }
 
   function removeTrackingScripts() {
-    document.querySelectorAll("script[src*='googletagmanager.com'], script[src*='google-analytics.com']").forEach(script => script.remove());
+    console.log("🚫 Removing tracking scripts");
+
+    // ✅ Remove Google Analytics Scripts
+    document.querySelectorAll("#gtag-script, #gtag-inline").forEach(script => script.remove());
+
+    // ✅ Clear tracking cookies
+    document.cookie.split(";").forEach(cookie => {
+      document.cookie = cookie.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date(0).toUTCString() + ";path=/");
+    });
+
     localStorage.removeItem("cookieConsent");
   }
 
@@ -33,11 +49,11 @@ document.addEventListener("DOMContentLoaded", function () {
     if (userConsent) {
       localStorage.setItem("cookieConsent", "accepted");
       enableTrackingScripts();
-      alert("Cookies enabled!");
+      alert("✅ Cookies enabled!");
     } else {
       localStorage.setItem("cookieConsent", "rejected");
       removeTrackingScripts();
-      alert("Tracking cookies disabled.");
+      alert("🚫 Tracking cookies disabled.");
     }
   }
 
@@ -45,30 +61,32 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (cookieConsent === "accepted") {
     enableTrackingScripts();
-    cookieBanner.classList.add("hidden");
+    cookieBanner.style.display = "none";
   } else if (cookieConsent === "rejected") {
     removeTrackingScripts();
-    cookieBanner.classList.add("hidden");
+    cookieBanner.style.display = "none";
   }
 
   acceptBtn.addEventListener("click", function () {
     localStorage.setItem("cookieConsent", "accepted");
     enableTrackingScripts();
-    cookieBanner.classList.add("hidden");
+    cookieBanner.style.display = "none";
   });
 
   rejectBtn.addEventListener("click", function () {
     localStorage.setItem("cookieConsent", "rejected");
     removeTrackingScripts();
-    cookieBanner.classList.add("hidden");
+    cookieBanner.style.display = "none";
   });
 
-  manageCookiesBtn.addEventListener("click", updateCookieConsent);
+  // ✅ Fix: Only add event listener if the button exists
+  if (manageCookiesBtn) {
+    manageCookiesBtn.addEventListener("click", updateCookieConsent);
+  }
 });
 
 // 📩 Secure Contact Form Submission (Frontend EmailJS + Backend reCAPTCHA)
 const contactForm = document.querySelector("#contact-form");
-const submitBtn = document.querySelector(".g-recaptcha");
 const nameInput = document.querySelector("#user_name");
 const emailInput = document.querySelector("#user_email");
 const messageInput = document.querySelector("#message");
@@ -122,7 +140,7 @@ function validateInputs() {
   return true;
 }
 
-// ✅ Handle Form Submission
+// ✅ Handle Form Submission with Invisible reCAPTCHA
 contactForm.addEventListener("submit", function (e) {
   e.preventDefault();
 
@@ -141,7 +159,7 @@ contactForm.addEventListener("submit", function (e) {
   grecaptcha.execute();
 });
 
-// ✅ Callback function for reCAPTCHA (Defined in the form)
+// ✅ Callback function for reCAPTCHA
 async function onSubmit(token) {
   console.log("✅ reCAPTCHA Token Received:", token);
 
@@ -150,8 +168,17 @@ async function onSubmit(token) {
     return;
   }
 
-  submitBtn.innerText = "Just a moment...";
-  submitBtn.disabled = true;
+  // ✅ Proceed with form submission after reCAPTCHA passes
+  await sendFormData(token);
+}
+
+// ✅ Function to process form submission
+async function sendFormData(token) {
+  const formData = {
+    name: nameInput.value,
+    email: emailInput.value,
+    message: messageInput.value
+  };
 
   try {
     // ✅ Verify reCAPTCHA via Backend
@@ -169,19 +196,12 @@ async function onSubmit(token) {
     }
 
     // ✅ Send Email via EmailJS
-    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-      name: nameInput.value,
-      email: emailInput.value,
-      message: messageInput.value
-    });
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, formData);
 
     alert("✅ Message sent successfully!");
     resetForm();
   } catch (error) {
     console.error("❌ Error Sending Message:", error);
     alert("Something went wrong ❌");
-  } finally {
-    submitBtn.innerText = "Send";
-    submitBtn.disabled = false;
   }
 }
