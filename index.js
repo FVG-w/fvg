@@ -85,8 +85,14 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
+
+
+
+
+
 // 📩 Secure Contact Form Submission (Frontend EmailJS + Backend reCAPTCHA)
 const contactForm = document.querySelector("#contact-form");
+const submitBtn = document.querySelector(".g-recaptcha");
 const nameInput = document.querySelector("#user_name");
 const emailInput = document.querySelector("#user_email");
 const messageInput = document.querySelector("#message");
@@ -100,108 +106,121 @@ const EMAILJS_TEMPLATE_ID = "template_krmeczq";
 const EMAILJS_PUBLIC_KEY = "AfUVgE7ii92j3o6lP";
 
 // ✅ Initialize EmailJS
-emailjs.init(EMAILJS_PUBLIC_KEY);
+if (typeof emailjs !== "undefined") {
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+} else {
+    console.error("❌ EmailJS failed to load. Check your script import in HTML.");
+}
 
 // ✅ Validate Email Format
 function isValidEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 // ✅ Reset Form
 function resetForm() {
-  nameInput.value = "";
-  emailInput.value = "";
-  messageInput.value = "";
-  grecaptcha.reset();
+    nameInput.value = "";
+    emailInput.value = "";
+    messageInput.value = "";
+    grecaptcha.reset();
 }
 
 // ✅ Validate Inputs
 function validateInputs() {
-  if (!nameInput.value.trim()) {
-    alert("❌ Name is required");
-    return false;
-  }
-  if (!emailInput.value.trim()) {
-    alert("❌ Email is required");
-    return false;
-  }
-  if (!isValidEmail(emailInput.value)) {
-    alert("❌ Invalid email format");
-    return false;
-  }
-  if (!messageInput.value.trim()) {
-    alert("❌ Message cannot be empty");
-    return false;
-  }
-  if (!agreementCheckbox.checked) {
-    alert("❌ You must agree to data processing");
-    return false;
-  }
-  return true;
+    if (!nameInput.value.trim()) {
+        alert("❌ Name is required");
+        return false;
+    }
+    if (!emailInput.value.trim()) {
+        alert("❌ Email is required");
+        return false;
+    }
+    if (!isValidEmail(emailInput.value)) {
+        alert("❌ Invalid email format");
+        return false;
+    }
+    if (!messageInput.value.trim()) {
+        alert("❌ Message cannot be empty");
+        return false;
+    }
+    if (!agreementCheckbox.checked) {
+        alert("❌ You must agree to data processing");
+        return false;
+    }
+    return true;
 }
 
-// ✅ Handle Form Submission with Invisible reCAPTCHA
+// ✅ Handle Form Submission
 contactForm.addEventListener("submit", function (e) {
-  e.preventDefault();
+    e.preventDefault();
 
-  // ✅ Ensure reCAPTCHA is loaded
-  if (typeof grecaptcha === "undefined") {
-    alert("❌ reCAPTCHA failed to load. Please refresh the page.");
-    return;
-  }
+    // ✅ Ensure reCAPTCHA is loaded
+    if (typeof grecaptcha === "undefined") {
+        alert("❌ reCAPTCHA failed to load. Please refresh the page.");
+        return;
+    }
 
-  // ✅ Validate inputs before triggering reCAPTCHA
-  if (!validateInputs()) {
-    return;
-  }
+    // ✅ Validate inputs before triggering reCAPTCHA
+    if (!validateInputs()) {
+        return;
+    }
 
-  // ✅ Trigger Invisible reCAPTCHA before form submission
-  grecaptcha.execute();
+    // ✅ Trigger Invisible reCAPTCHA before form submission
+    grecaptcha.execute();
 });
 
-// ✅ Callback function for reCAPTCHA
+// ✅ Callback function for reCAPTCHA (Triggered after completion)
 async function onSubmit(token) {
-  console.log("✅ reCAPTCHA Token Received:", token);
+    console.log("✅ reCAPTCHA Token Received:", token);
 
-  if (!token) {
-    alert("❌ reCAPTCHA verification failed.");
-    return;
-  }
+    if (!token) {
+        alert("❌ reCAPTCHA verification failed.");
+        return;
+    }
 
-  // ✅ Proceed with form submission after reCAPTCHA passes
-  await sendFormData(token);
+    // ✅ Proceed with form submission after reCAPTCHA passes
+    await sendFormData(token);
 }
 
 // ✅ Function to process form submission
 async function sendFormData(token) {
-  const formData = {
-    name: nameInput.value,
-    email: emailInput.value,
-    message: messageInput.value
-  };
+    console.log("📤 Sending form data...");
 
-  try {
-    // ✅ Verify reCAPTCHA via Backend
-    const recaptchaRes = await fetch(`${BACKEND_URL}/verify-recaptcha`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token }),
-    });
+    submitBtn.innerText = "Just a moment...";
+    submitBtn.disabled = true;
 
-    const recaptchaData = await recaptchaRes.json();
-    if (!recaptchaData.success) {
-      alert("❌ reCAPTCHA verification failed. Please try again.");
-      grecaptcha.reset();
-      return;
+    try {
+        // ✅ Verify reCAPTCHA via Backend
+        const recaptchaRes = await fetch(`${BACKEND_URL}/verify-recaptcha`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token }),
+        });
+
+        const recaptchaData = await recaptchaRes.json();
+        console.log("🔍 reCAPTCHA Response:", recaptchaData);
+
+        if (!recaptchaData.success) {
+            alert("❌ reCAPTCHA verification failed. Please try again.");
+            grecaptcha.reset();
+            return;
+        }
+
+        // ✅ Send Email via EmailJS
+        const emailResponse = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+            name: nameInput.value,
+            email: emailInput.value,
+            message: messageInput.value
+        });
+
+        console.log("📧 EmailJS Response:", emailResponse);
+        alert("✅ Message sent successfully!");
+        resetForm();
+    } catch (error) {
+        console.error("❌ Error Sending Message:", error);
+        alert("Something went wrong ❌");
+    } finally {
+        submitBtn.innerText = "Send";
+        submitBtn.disabled = false;
     }
-
-    // ✅ Send Email via EmailJS
-    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, formData);
-
-    alert("✅ Message sent successfully!");
-    resetForm();
-  } catch (error) {
-    console.error("❌ Error Sending Message:", error);
-    alert("Something went wrong ❌");
-  }
 }
