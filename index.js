@@ -97,6 +97,7 @@ const nameInput = document.querySelector("#user_name");
 const emailInput = document.querySelector("#user_email");
 const messageInput = document.querySelector("#message");
 const agreementCheckbox = document.querySelector("#data_agreement");
+const messageBox = document.createElement("p");  // ✅ Message display element
 
 const BACKEND_URL = "https://fog-back-key4.onrender.com"; 
 
@@ -107,6 +108,19 @@ const EMAILJS_PUBLIC_KEY = "AfUVgE7ii92j3o6lP";
 
 // ✅ Initialize EmailJS
 emailjs.init(EMAILJS_PUBLIC_KEY);
+
+// ✅ Add message box to form
+messageBox.style.color = "#ffffff";
+messageBox.style.fontSize = "16px";
+messageBox.style.marginTop = "10px";
+messageBox.style.fontWeight = "bold";
+contactForm.appendChild(messageBox);
+
+// ✅ Function to show messages
+function showMessage(text, isSuccess = true) {
+  messageBox.textContent = text;
+  messageBox.style.color = isSuccess ? "green" : "red";
+}
 
 // ✅ Validate Email Format
 function isValidEmail(email) {
@@ -123,24 +137,16 @@ function resetForm() {
 
 // ✅ Validate Inputs
 function validateInputs() {
-  if (!nameInput.value.trim()) {
-    alert("❌ Name is required");
-    return false;
-  }
-  if (!emailInput.value.trim()) {
-    alert("❌ Email is required");
-    return false;
-  }
-  if (!isValidEmail(emailInput.value)) {
-    alert("❌ Invalid email format");
-    return false;
-  }
-  if (!messageInput.value.trim()) {
-    alert("❌ Message cannot be empty");
-    return false;
-  }
-  if (!agreementCheckbox.checked) {
-    alert("❌ You must agree to data processing");
+  let errors = [];
+
+  if (!nameInput.value.trim()) errors.push("❌ Name is required.");
+  if (!emailInput.value.trim()) errors.push("❌ Email is required.");
+  if (!isValidEmail(emailInput.value)) errors.push("❌ Invalid email format.");
+  if (!messageInput.value.trim()) errors.push("❌ Message cannot be empty.");
+  if (!agreementCheckbox.checked) errors.push("❌ You must agree to data processing.");
+
+  if (errors.length > 0) {
+    showMessage(errors.join(" "), false);
     return false;
   }
   return true;
@@ -149,7 +155,7 @@ function validateInputs() {
 // ✅ Ensure reCAPTCHA Script is Loaded
 function ensureRecaptchaLoaded() {
   if (typeof grecaptcha === "undefined") {
-    alert("❌ reCAPTCHA failed to load. Please refresh the page.");
+    showMessage("❌ reCAPTCHA failed to load. Please refresh the page.", false);
     return false;
   }
   return true;
@@ -170,7 +176,7 @@ contactForm.addEventListener("submit", function (e) {
     })
     .catch(err => {
       console.error("❌ Error executing reCAPTCHA:", err);
-      alert("❌ reCAPTCHA failed. Please try again.");
+      showMessage("❌ reCAPTCHA failed. Please try again.", false);
     });
 });
 
@@ -191,7 +197,7 @@ async function sendFormData(token) {
 
     if (!recaptchaData.success) {
       console.error("❌ reCAPTCHA verification failed:", recaptchaData.details);
-      alert("❌ reCAPTCHA verification failed. Please try again.");
+      showMessage("❌ reCAPTCHA verification failed. Please try again.", false);
       grecaptcha.reset();
       return;
     }
@@ -206,11 +212,11 @@ async function sendFormData(token) {
     });
 
     console.log("✅ EmailJS Response:", emailResponse);
-    alert("✅ Message sent successfully!");
+    showMessage("✅ Message sent successfully!", true);
     resetForm();
   } catch (error) {
     console.error("❌ Error Sending Message:", error);
-    alert("Something went wrong ❌");
+    showMessage("❌ Something went wrong. Please try again later.", false);
   } finally {
     submitBtn.innerText = "Send";
     submitBtn.disabled = false;
