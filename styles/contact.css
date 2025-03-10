@@ -203,3 +203,132 @@ h3 {
   font-size: 15px;
   margin-top: 70px;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+/* Cookie Banner */
+.cookie-banner {
+  font-family: "Be Vietnam Pro", sans-serif;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  text-align: center;
+  padding: 15px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  z-index: 9999;
+  flex-wrap: wrap;
+}
+
+.cookie-link {
+  text-decoration: underline;
+  color: rgb(255, 255, 255);
+}
+
+.cookie-link:hover {
+  color: rgb(194, 194, 194);
+}
+
+/* Cookie Text */
+.cookie-text {
+  margin: 0;
+  flex: 1;
+  max-width: 600px;
+  text-align: left;
+}
+
+/* Buttons Wrapper */
+.cookie-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.cookie-btn {
+  background-color: rgb(38, 67, 94) ;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: 0.3s;
+}
+
+.cookie-btn:hover {
+  background-color: rgb(27, 48, 68);
+}
+
+.reject-btn {
+  background-color: rgb(101, 101, 101);
+}
+
+.reject-btn:hover {
+  background-color: rgb(77, 77, 77);
+}
+
+/* Responsive for Small Screens */
+@media (max-width: 600px) {
+  .cookie-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .cookie-text {
+    order: 2;
+    text-align: center;
+    padding-top: 10px;
+  }
+
+  .cookie-buttons {
+    order: 1; 
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .cookie-btn {
+    width: 100%;
+  }
+}
+
+/* Hide banner if accepted */
+.hidden {
+  display: none;
+}
+
+/* Manage Cookies Button */
+.footer-dark .cookie-btn-manage {
+  background-color: transparent;
+  border: 1px solid white;
+  padding: 8px 15px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 5px;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.cookie-btn-manage {
+  margin-top: 25px;
+}
+
+.footer-dark .cookie-btn-manage:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
