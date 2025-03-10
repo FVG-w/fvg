@@ -97,24 +97,24 @@ const nameInput = document.querySelector("#user_name");
 const emailInput = document.querySelector("#user_email");
 const messageInput = document.querySelector("#message");
 const agreementCheckbox = document.querySelector("#data_agreement");
-const messageBox = document.createElement("p"); // ✅ Message display element
+
+// ✅ Create a message box for displaying errors/success
+const messageBox = document.createElement("p");
+messageBox.style.color = "#ffffff";
+messageBox.style.fontSize = "16px";
+messageBox.style.marginTop = "10px";
+messageBox.style.fontWeight = "bold";
+contactForm.appendChild(messageBox);
 
 const BACKEND_URL = "https://fog-back-key4.onrender.com"; 
 
-// ✅ Updated EmailJS Credentials
+// ✅ EmailJS Credentials
 const EMAILJS_SERVICE_ID = "service_ufzg759";  
 const EMAILJS_TEMPLATE_ID = "template_krmeczq";
 const EMAILJS_PUBLIC_KEY = "AfUVgE7ii92j3o6lP";
 
 // ✅ Initialize EmailJS
 emailjs.init(EMAILJS_PUBLIC_KEY);
-
-// ✅ Add message box to form
-messageBox.style.color = "#ffffff";
-messageBox.style.fontSize = "16px";
-messageBox.style.marginTop = "10px";
-messageBox.style.fontWeight = "bold";
-contactForm.appendChild(messageBox);
 
 // ✅ Function to show messages
 function showMessage(text, isSuccess = true) {
@@ -132,6 +132,7 @@ function resetForm() {
   nameInput.value = "";
   emailInput.value = "";
   messageInput.value = "";
+  agreementCheckbox.checked = false;
   grecaptcha.reset();
 }
 
@@ -165,10 +166,17 @@ function ensureRecaptchaLoaded() {
 contactForm.addEventListener("submit", function (e) {
   e.preventDefault();
 
-  if (!ensureRecaptchaLoaded()) return;
-  if (!validateInputs()) return;
+  // 🔴 First, strictly validate all input fields
+  if (!validateInputs()) {
+    return; // 🚫 Stop here if validation fails
+  }
 
-  // ✅ Trigger reCAPTCHA
+  // 🔴 Ensure reCAPTCHA is loaded before proceeding
+  if (!ensureRecaptchaLoaded()) {
+    return;
+  }
+
+  // ✅ If validation passes, trigger reCAPTCHA
   grecaptcha.execute("6LcjBPAqAAAAAKKz-7U791WtW5lgHUisYZe2Tr0k", { action: "submit" })
     .then(token => {
       console.log("✅ reCAPTCHA Token:", token);
