@@ -101,7 +101,7 @@ const agreementCheckbox = document.querySelector("#data_agreement");
 const BACKEND_URL = "https://fog-back-key4.onrender.com"; 
 
 // ✅ Updated EmailJS Credentials
-const EMAILJS_SERVICE_ID = "service_ufzg759";  // 🔹 Correct Service ID
+const EMAILJS_SERVICE_ID = "service_ufzg759";  
 const EMAILJS_TEMPLATE_ID = "template_krmeczq";
 const EMAILJS_PUBLIC_KEY = "AfUVgE7ii92j3o6lP";
 
@@ -110,7 +110,7 @@ emailjs.init(EMAILJS_PUBLIC_KEY);
 
 // ✅ Validate Email Format
 function isValidEmail(email) {
-  return /^[^\s@]+@[^\s@]+.[^\s@]+$/.test(email);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 // ✅ Reset Form
@@ -146,41 +146,33 @@ function validateInputs() {
   return true;
 }
 
+// ✅ Ensure reCAPTCHA Script is Loaded
+function ensureRecaptchaLoaded() {
+  if (typeof grecaptcha === "undefined") {
+    alert("❌ reCAPTCHA failed to load. Please refresh the page.");
+    return false;
+  }
+  return true;
+}
+
 // ✅ Handle Form Submission with Invisible reCAPTCHA
 contactForm.addEventListener("submit", function (e) {
   e.preventDefault();
 
-  // ✅ Ensure reCAPTCHA is loaded
-  if (typeof grecaptcha === "undefined") {
-    alert("❌ reCAPTCHA failed to load. Please refresh the page.");
-    return;
-  }
+  if (!ensureRecaptchaLoaded()) return;
+  if (!validateInputs()) return;
 
-  // ✅ Validate inputs before triggering reCAPTCHA
-  if (!validateInputs()) {
-    return;
-  }
-
-  // ✅ Trigger Invisible reCAPTCHA before form submission
-  grecaptcha.execute();
+  // ✅ Trigger reCAPTCHA
+  grecaptcha.execute("6LcjBPAqAAAAAKKz-7U791WtW5lgHUisYZe2Tr0k", { action: "submit" })
+    .then(token => {
+      console.log("✅ reCAPTCHA Token:", token);
+      sendFormData(token);
+    })
+    .catch(err => {
+      console.error("❌ Error executing reCAPTCHA:", err);
+      alert("❌ reCAPTCHA failed. Please try again.");
+    });
 });
-
-// ✅ Callback function for reCAPTCHA (defined in the form)
-async function onSubmit(token) {
-  console.log("✅ reCAPTCHA Token Received:", token);
-
-  if (!token || token.trim() === "") {
-    console.error("❌ reCAPTCHA token is missing or empty.");
-    alert("❌ reCAPTCHA verification failed. Please refresh the page and try again.");
-    grecaptcha.reset();
-    return;
-  }
-
-  submitBtn.innerText = "Just a moment...";
-  submitBtn.disabled = true;
-
-  await sendFormData(token);
-}
 
 // ✅ Function to process form submission
 async function sendFormData(token) {
@@ -191,7 +183,7 @@ async function sendFormData(token) {
     const recaptchaRes = await fetch(`${BACKEND_URL}/verify-recaptcha`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token }),  // 🔹 Ensures token is sent properly
+      body: JSON.stringify({ token }),
     });
 
     const recaptchaData = await recaptchaRes.json();
