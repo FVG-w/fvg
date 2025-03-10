@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // 📩 Secure Contact Form Submission (Frontend EmailJS + Backend reCAPTCHA)
 const contactForm = document.querySelector("#contact-form");
-const submitBtn = document.querySelector(".submit-btn");
+const submitBtn = document.querySelector(".g-recaptcha");
 const nameInput = document.querySelector("#user_name");
 const emailInput = document.querySelector("#user_email");
 const messageInput = document.querySelector("#message");
@@ -123,44 +123,47 @@ function validateInputs() {
 }
 
 // ✅ Handle Form Submission
-contactForm.addEventListener("submit", async (e) => {
+contactForm.addEventListener("submit", function (e) {
   e.preventDefault();
+
+  // ✅ Ensure reCAPTCHA is loaded
+  if (typeof grecaptcha === "undefined") {
+    alert("❌ reCAPTCHA failed to load. Please refresh the page.");
+    return;
+  }
+
+  // ✅ Validate inputs before triggering reCAPTCHA
+  if (!validateInputs()) {
+    return;
+  }
+
+  // ✅ Trigger Invisible reCAPTCHA before form submission
+  grecaptcha.execute();
+});
+
+// ✅ Callback function for reCAPTCHA (Defined in the form)
+async function onSubmit(token) {
+  console.log("✅ reCAPTCHA Token Received:", token);
+
+  if (!token) {
+    alert("❌ reCAPTCHA verification failed.");
+    return;
+  }
+
   submitBtn.innerText = "Just a moment...";
   submitBtn.disabled = true;
-
-  if (!validateInputs()) {
-    submitBtn.innerText = "Send";
-    submitBtn.disabled = false;
-    return;
-  }
-
-  // ✅ Ensure reCAPTCHA is Loaded
-  if (typeof grecaptcha === "undefined") {
-    alert("reCAPTCHA not loaded, please try again.");
-    submitBtn.innerText = "Send";
-    submitBtn.disabled = false;
-    return;
-  }
-
-  const recaptchaResponse = grecaptcha.getResponse();
-  if (!recaptchaResponse) {
-    alert("❌ Please complete reCAPTCHA");
-    submitBtn.innerText = "Send";
-    submitBtn.disabled = false;
-    return;
-  }
 
   try {
     // ✅ Verify reCAPTCHA via Backend
     const recaptchaRes = await fetch(`${BACKEND_URL}/verify-recaptcha`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: recaptchaResponse }),
+      body: JSON.stringify({ token }),
     });
 
     const recaptchaData = await recaptchaRes.json();
     if (!recaptchaData.success) {
-      alert("❌ reCAPTCHA verification failed");
+      alert("❌ reCAPTCHA verification failed. Please try again.");
       grecaptcha.reset();
       return;
     }
@@ -175,10 +178,10 @@ contactForm.addEventListener("submit", async (e) => {
     alert("✅ Message sent successfully!");
     resetForm();
   } catch (error) {
-    console.error("❌ Error Sending Email:", error);
+    console.error("❌ Error Sending Message:", error);
     alert("Something went wrong ❌");
   } finally {
     submitBtn.innerText = "Send";
     submitBtn.disabled = false;
   }
-});
+}
