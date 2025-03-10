@@ -101,7 +101,7 @@ const agreementCheckbox = document.querySelector("#data_agreement");
 const BACKEND_URL = "https://fog-back-key4.onrender.com"; 
 
 // ✅ Updated EmailJS Credentials
-const EMAILJS_SERVICE_ID = "service_ufzg759";  // 🔹 Updated Service ID
+const EMAILJS_SERVICE_ID = "service_ufzg759";  // 🔹 Correct Service ID
 const EMAILJS_TEMPLATE_ID = "template_krmeczq";
 const EMAILJS_PUBLIC_KEY = "AfUVgE7ii92j3o6lP";
 
@@ -110,7 +110,7 @@ emailjs.init(EMAILJS_PUBLIC_KEY);
 
 // ✅ Validate Email Format
 function isValidEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  return /^[^\s@]+@[^\s@]+.[^\s@]+$/.test(email);
 }
 
 // ✅ Reset Form
@@ -182,26 +182,27 @@ async function onSubmit(token) {
 
 // ✅ Function to process form submission
 async function sendFormData(token) {
-  console.log("📤 Sending form data...");
+  console.log("📤 Sending form data with reCAPTCHA token:", token);
 
   try {
     // ✅ Verify reCAPTCHA via Backend
     const recaptchaRes = await fetch(`${BACKEND_URL}/verify-recaptcha`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token }),
+      body: JSON.stringify({ token }),  // 🔹 Ensures token is sent properly
     });
 
     const recaptchaData = await recaptchaRes.json();
     console.log("🔍 reCAPTCHA Response:", recaptchaData);
 
     if (!recaptchaData.success) {
+      console.error("❌ reCAPTCHA verification failed:", recaptchaData.details);
       alert("❌ reCAPTCHA verification failed. Please try again.");
       grecaptcha.reset();
       return;
     }
 
-    // ✅ Send Email via EmailJS
+    // ✅ Send Email via EmailJS after reCAPTCHA success
     console.log("📧 Sending email via EmailJS...");
 
     const emailResponse = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
