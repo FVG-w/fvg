@@ -206,9 +206,9 @@ async function sendFormData(token) {
     console.log("📧 Sending email via EmailJS...");
 
     const emailResponse = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-      name: nameInput.value,
-      email: emailInput.value,
-      message: messageInput.value
+      name: nameInput.value.trim(),
+      email: emailInput.value.trim(),
+      message: messageInput.value.trim()
     });
 
     console.log("✅ EmailJS Response:", emailResponse);
