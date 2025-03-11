@@ -98,7 +98,25 @@ const emailInput = document.querySelector("#user_email");
 const messageInput = document.querySelector("#message");
 const agreementCheckbox = document.querySelector("#data_agreement");
 
-// ✅ Create a message box for displaying errors/success
+// ✅ Error Message Containers
+const errorMessages = {
+  name: document.createElement("p"),
+  email: document.createElement("p"),
+  message: document.createElement("p"),
+  checkbox: document.createElement("p"),
+};
+Object.values(errorMessages).forEach(msg => {
+  msg.style.color = "red";
+  msg.style.fontSize = "14px";
+  msg.style.marginTop = "5px";
+});
+
+nameInput.parentNode.appendChild(errorMessages.name);
+emailInput.parentNode.appendChild(errorMessages.email);
+messageInput.parentNode.appendChild(errorMessages.message);
+agreementCheckbox.parentNode.appendChild(errorMessages.checkbox);
+
+// ✅ Success/Error Message Box
 const messageBox = document.createElement("p");
 messageBox.style.color = "#ffffff";
 messageBox.style.fontSize = "16px";
@@ -116,7 +134,15 @@ const EMAILJS_PUBLIC_KEY = "AfUVgE7ii92j3o6lP";
 // ✅ Initialize EmailJS
 emailjs.init(EMAILJS_PUBLIC_KEY);
 
-// ✅ Function to show messages
+// ✅ Function to show form validation messages
+function showError(input, message) {
+  errorMessages[input].textContent = message;
+}
+function clearErrors() {
+  Object.values(errorMessages).forEach(msg => msg.textContent = "");
+}
+
+// ✅ Function to show messages (Success or Error)
 function showMessage(text, isSuccess = true) {
   messageBox.textContent = text;
   messageBox.style.color = isSuccess ? "green" : "red";
@@ -127,21 +153,32 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-// ✅ Validate Inputs **STRICTLY**
+// ✅ Strictly Validate Inputs
 function validateInputs() {
-  let errors = [];
+  clearErrors(); // Remove previous errors
+  let isValid = true;
 
-  if (!nameInput.value.trim()) errors.push("❌ Name is required.");
-  if (!emailInput.value.trim()) errors.push("❌ Email is required.");
-  if (!isValidEmail(emailInput.value)) errors.push("❌ Invalid email format.");
-  if (!messageInput.value.trim()) errors.push("❌ Message cannot be empty.");
-  if (!agreementCheckbox.checked) errors.push("❌ You must agree to data processing.");
-
-  if (errors.length > 0) {
-    showMessage(errors.join(" "), false);
-    return false; // 🚨 Stop execution if validation fails
+  if (!nameInput.value.trim()) {
+    showError("name", "❌ Name is required.");
+    isValid = false;
   }
-  return true;
+  if (!emailInput.value.trim()) {
+    showError("email", "❌ Email is required.");
+    isValid = false;
+  } else if (!isValidEmail(emailInput.value)) {
+    showError("email", "❌ Invalid email format.");
+    isValid = false;
+  }
+  if (!messageInput.value.trim()) {
+    showError("message", "❌ Message cannot be empty.");
+    isValid = false;
+  }
+  if (!agreementCheckbox.checked) {
+    showError("checkbox", "❌ You must agree to data processing.");
+    isValid = false;
+  }
+
+  return isValid;
 }
 
 // ✅ Ensure reCAPTCHA Script is Loaded
@@ -153,7 +190,7 @@ function ensureRecaptchaLoaded() {
   return true;
 }
 
-// ✅ Handle Form Submission with **Strict Validation**
+// ✅ Handle Form Submission with **Validation First**
 contactForm.addEventListener("submit", function (e) {
   e.preventDefault();
 
@@ -202,7 +239,14 @@ async function sendFormData(token) {
       return; // ❌ STOP HERE IF reCAPTCHA FAILS
     }
 
-    // ✅ Send Email via EmailJS after reCAPTCHA **AND validation** pass
+    // 🚨 **Block empty message submission to EmailJS**
+    if (!validateInputs()) {
+      console.error("❌ Validation failed AFTER reCAPTCHA. Message NOT sent.");
+      showMessage("❌ Fix the errors before sending the message.", false);
+      return;
+    }
+
+    // ✅ Send Email via EmailJS after passing validation & reCAPTCHA
     console.log("📧 Sending email via EmailJS...");
 
     const emailResponse = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
