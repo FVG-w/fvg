@@ -90,40 +90,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-// 📩 Secure Contact Form Submission (Frontend EmailJS + Backend reCAPTCHA)
+// 📩 Secure Contact Form Submission with Validation + reCAPTCHA
 const contactForm = document.querySelector("#contact-form");
-const submitBtn = document.querySelector(".g-recaptcha");
+const submitBtn = document.querySelector(".submit-btn");
 const nameInput = document.querySelector("#user_name");
 const emailInput = document.querySelector("#user_email");
 const messageInput = document.querySelector("#message");
 const agreementCheckbox = document.querySelector("#data_agreement");
+const statusMessage = document.getElementById("form-status");
 
-// ✅ Error Message Containers
-const errorMessages = {
-  name: document.createElement("p"),
-  email: document.createElement("p"),
-  message: document.createElement("p"),
-  checkbox: document.createElement("p"),
-};
-Object.values(errorMessages).forEach(msg => {
-  msg.style.color = "red";
-  msg.style.fontSize = "14px";
-  msg.style.marginTop = "5px";
-});
-
-nameInput.parentNode.appendChild(errorMessages.name);
-emailInput.parentNode.appendChild(errorMessages.email);
-messageInput.parentNode.appendChild(errorMessages.message);
-agreementCheckbox.parentNode.appendChild(errorMessages.checkbox);
-
-// ✅ Success/Error Message Box
-const messageBox = document.createElement("p");
-messageBox.style.color = "#ffffff";
-messageBox.style.fontSize = "16px";
-messageBox.style.marginTop = "10px";
-messageBox.style.fontWeight = "bold";
-contactForm.appendChild(messageBox);
-
+// ✅ Backend API URL
 const BACKEND_URL = "https://fog-back-key4.onrender.com"; 
 
 // ✅ EmailJS Credentials
@@ -134,18 +110,10 @@ const EMAILJS_PUBLIC_KEY = "AfUVgE7ii92j3o6lP";
 // ✅ Initialize EmailJS
 emailjs.init(EMAILJS_PUBLIC_KEY);
 
-// ✅ Function to show form validation messages
-function showError(input, message) {
-  errorMessages[input].textContent = message;
-}
-function clearErrors() {
-  Object.values(errorMessages).forEach(msg => msg.textContent = "");
-}
-
-// ✅ Function to show messages (Success or Error)
-function showMessage(text, isSuccess = true) {
-  messageBox.textContent = text;
-  messageBox.style.color = isSuccess ? "green" : "red";
+// ✅ Function to display success/error messages
+function showStatusMessage(text, isSuccess = true) {
+  statusMessage.textContent = text;
+  statusMessage.style.color = isSuccess ? "green" : "red";
 }
 
 // ✅ Validate Email Format
@@ -153,123 +121,66 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-// ✅ Strictly Validate Inputs
+// ✅ Validate Inputs
 function validateInputs() {
-  clearErrors(); // Remove previous errors
   let isValid = true;
 
+  document.querySelectorAll(".error-message").forEach(msg => msg.textContent = ""); // Clear previous errors
+
   if (!nameInput.value.trim()) {
-    showError("name", "❌ Name is required.");
+    document.getElementById("error-name").textContent = "❌ Name is required.";
     isValid = false;
   }
   if (!emailInput.value.trim()) {
-    showError("email", "❌ Email is required.");
+    document.getElementById("error-email").textContent = "❌ Email is required.";
     isValid = false;
   } else if (!isValidEmail(emailInput.value)) {
-    showError("email", "❌ Invalid email format.");
+    document.getElementById("error-email").textContent = "❌ Invalid email format.";
     isValid = false;
   }
   if (!messageInput.value.trim()) {
-    showError("message", "❌ Message cannot be empty.");
+    document.getElementById("error-message").textContent = "❌ Message cannot be empty.";
     isValid = false;
   }
   if (!agreementCheckbox.checked) {
-    showError("checkbox", "❌ You must agree to data processing.");
+    document.getElementById("error-checkbox").textContent = "❌ You must agree to data processing.";
     isValid = false;
   }
 
   return isValid;
 }
 
-// ✅ Ensure reCAPTCHA Script is Loaded
-function ensureRecaptchaLoaded() {
-  if (typeof grecaptcha === "undefined") {
-    showMessage("❌ reCAPTCHA failed to load. Please refresh the page.", false);
-    return false;
-  }
-  return true;
-}
-
-// ✅ Handle Form Submission with **Validation First**
-contactForm.addEventListener("submit", function (e) {
+// ✅ Handle Form Submission
+contactForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  // 🚨 **VALIDATION FIRST: Prevent blank submissions**
-  if (!validateInputs()) {
-    console.log("🚫 Form validation failed. Fix errors and try again.");
-    return; // ❌ STOP FORM FROM BEING SENT
-  }
+  if (!validateInputs()) return;
 
-  // 🚨 **Ensure reCAPTCHA is loaded before executing**
-  if (!ensureRecaptchaLoaded()) {
+  submitBtn.innerText = "Just a moment...";
+  submitBtn.disabled = true;
+
+  const recaptchaResponse = grecaptcha.getResponse();
+  if (!recaptchaResponse) {
+    showStatusMessage("❌ Please complete reCAPTCHA.", false);
+    submitBtn.innerText = "Send";
+    submitBtn.disabled = false;
     return;
   }
 
-  // ✅ If everything is valid, trigger reCAPTCHA
-  grecaptcha.execute("6LcjBPAqAAAAAKKz-7U791WtW5lgHUisYZe2Tr0k", { action: "submit" })
-    .then(token => {
-      console.log("✅ reCAPTCHA Token:", token);
-      sendFormData(token);
-    })
-    .catch(err => {
-      console.error("❌ Error executing reCAPTCHA:", err);
-      showMessage("❌ reCAPTCHA failed. Please try again.", false);
-    });
-});
-
-// ✅ Function to process form submission **only if validation & reCAPTCHA pass**
-async function sendFormData(token) {
-  console.log("📤 Sending form data with reCAPTCHA token:", token);
-
   try {
-    // ✅ Verify reCAPTCHA via Backend
-    const recaptchaRes = await fetch(`${BACKEND_URL}/verify-recaptcha`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token }),
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      name: nameInput.value,
+      email: emailInput.value,
+      message: messageInput.value
     });
 
-    const recaptchaData = await recaptchaRes.json();
-    console.log("🔍 reCAPTCHA Response:", recaptchaData);
-
-    if (!recaptchaData.success) {
-      console.error("❌ reCAPTCHA verification failed:", recaptchaData.details);
-      showMessage("❌ reCAPTCHA verification failed. Please try again.", false);
-      grecaptcha.reset();
-      return; // ❌ STOP HERE IF reCAPTCHA FAILS
-    }
-
-    // 🚨 **Block empty message submission to EmailJS**
-    if (!validateInputs()) {
-      console.error("❌ Validation failed AFTER reCAPTCHA. Message NOT sent.");
-      showMessage("❌ Fix the errors before sending the message.", false);
-      return;
-    }
-
-    // ✅ Send Email via EmailJS after passing validation & reCAPTCHA
-    console.log("📧 Sending email via EmailJS...");
-
-    const emailResponse = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-      name: nameInput.value.trim(),
-      email: emailInput.value.trim(),
-      message: messageInput.value.trim()
-    });
-
-    console.log("✅ EmailJS Response:", emailResponse);
-    showMessage("✅ Message sent successfully!", true);
-    
-    // ✅ Reset the form after successful submission
-    nameInput.value = "";
-    emailInput.value = "";
-    messageInput.value = "";
-    agreementCheckbox.checked = false;
+    showStatusMessage("✅ Message sent successfully!", true);
+    contactForm.reset();
     grecaptcha.reset();
-    
   } catch (error) {
-    console.error("❌ Error Sending Message:", error);
-    showMessage("❌ Something went wrong. Please try again later.", false);
-  } finally {
-    submitBtn.innerText = "Send";
-    submitBtn.disabled = false;
+    showStatusMessage("❌ Something went wrong.", false);
   }
-}
+
+  submitBtn.innerText = "Send";
+  submitBtn.disabled = false;
+});
