@@ -24,25 +24,7 @@
     <meta property="og:image:height" content="621" />
     <meta property="og:title" content="Film Vault Gazette">
     <meta property="og:description" content="Film Vault Gazette T&Cs"/>
-    <!--(gtag.js)-->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-9JET0VYD3C"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-9JET0VYD3C');
-    </script>
-    <script>
-      (function(h,o,t,j,a,r){
-          h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-          h._hjSettings={hjid:5041979,hjsv:6};
-          a=o.getElementsByTagName('head')[0];
-          r=o.createElement('script');r.async=1;
-          r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
-          a.appendChild(r);
-      })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
-    </script>
+    <!-- Google Analytics (conditionally injected) -->
     <!--Google Fonts-->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -61,7 +43,7 @@
             <span class="toggler-icon middle-bar"></span>
             <span class="toggler-icon bottom-bar"></span>
           </button>
-          <a class="navbar-brand" href="index.html">
+          <a class="navbar-brand" href="/">
             <img src="/assets/logo.jpg" alt="Film Vault Gazette logo" width="75" class="d-inline-block align-text-top">
           </a>
           <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
@@ -116,7 +98,16 @@
         </div>
       </div>
     </main>
-    
+
+    <!--Cookie banner-->
+    <div id="cookie-banner" class="cookie-banner">
+      <p class="cookie-text">We use <a href="/privacy.html" class="cookie-link">Cookies</a> to enhance your experience. By accepting, you allow tracking. You can reject non-essential cookies.</p>
+      <div class="cookie-buttons">
+        <button id="accept-cookies" class="cookie-btn accept-btn" aria-label="Accept all cookies and enable tracking">Accept All Cookies</button>
+        <button id="reject-cookies" class="cookie-btn reject-btn" aria-label="Reject non-essential cookies and disable tracking">Reject Non-Essential</button>
+      </div>
+    </div>
+
     <footer class="p-5 bg-dark text-light footer-dark">
       <div class="container">
         <h3 class="mb-4">Join Us!</h3>
@@ -137,10 +128,12 @@
             <div>
               <a class="footer-text" href="accessibility.html">Accessibility Policy</a><br>
               <a class="footer-text" href="terms.html">Terms &#38; Conditions</a><br>
+              <a class="footer-text" href="privacy.html">Privacy Policy</a><br>
               <a class="footer-text" href="https://icons8.com" target="_blank">Icons by Icons8</a><br>
+              <button id="manage-cookies-btn" class="cookie-btn-manage">Manage Cookies</button>
             </div>
           </div>
-          <p class="copyright">Copyright &#169; 2024 Film Vault Gazette</p>
+          <p class="copyright">Copyright &#169; 2025 Film Vault Gazette</p>
         </div>
       </div>
     </footer>

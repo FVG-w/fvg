@@ -181,18 +181,18 @@ h2 {
 @media (max-width: 767px) {
   .container {
     padding-left: 12px;
-    padding-right: 12px; /* Remove padding from containers to allow full width */
-    max-width: 100%; /* Ensure container fills the entire width of the screen */
+    padding-right: 12px; 
+    max-width: 100%;
   }
 
   .img-fluid {
-    width: 100% !important; /* Make images fill the whole width */
-    height: auto !important; /* Maintain aspect ratio */
+    width: 100% !important;
+    height: auto !important;
   }
 
   .artist-text {
-    margin-left: 0; /* Remove left margin for artist text */
-    text-align: center; /* Center align artist text on small screens */
+    margin-left: 0;
+    text-align: center;
   }
 }
 
@@ -267,4 +267,116 @@ h4 {
 
 #backToTopBtn:hover {
   background-color: #838383;
+}
+
+.cookie-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.938);
+  color: rgb(0, 0, 0);
+  text-align: center;
+  padding: 20px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content:space-around;
+  gap: 20px;
+  z-index: 9999;
+  flex-wrap: wrap;
+}
+
+.cookie-link {
+  text-decoration: underline;
+  color: rgb(0, 0, 0);
+}
+
+.cookie-link:hover {
+  color: rgb(79, 79, 79);
+}
+
+.cookie-text {
+  margin: 0;
+  flex: 1;
+  max-width: 2000px;
+  text-align: left;
+}
+
+.cookie-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.cookie-btn {
+  background-color: rgb(59, 59, 59);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 15px;
+  font-family: 'Fira Mono', monospace;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: 0.3s;
+}
+
+.cookie-btn:hover {
+  background-color: rgb(138, 138, 138);
+}
+
+.reject-btn {
+  background-color: rgb(101, 101, 101);
+}
+
+.reject-btn:hover {
+  background-color: rgb(161, 161, 161);
+}
+
+@media (max-width: 600px) {
+  .cookie-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .cookie-text {
+    order: 2;
+    text-align: center;
+    padding-top: 10px;
+  }
+
+  .cookie-buttons {
+    order: 1; 
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .cookie-btn {
+    width: 100%;
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+.footer-dark .cookie-btn-manage {
+  background-color: black;
+  border: 1px solid rgb(0, 0, 0);
+  padding: 8px 15px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 5px;
+  color: rgb(255, 255, 255);
+  transition: all 0.3s ease;
+}
+
+.cookie-btn-manage {
+  margin-top: 25px;
+}
+
+.footer-dark .cookie-btn-manage:hover {
+  background-color: rgb(75, 75, 75);
 }

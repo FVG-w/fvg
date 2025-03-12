@@ -8,6 +8,12 @@
     <meta name="description" content="Discover the captivating world of film photography through monthly curated collections of talented Instagram artists. Their stories, film and analog cameras they wield, all brought together in one place.">
     <meta name="keywords" content="Photography, Film photography, 35mm film, 120mm film, curated collections, analog art, monthly showcases, vintage photography, visual storytelling">
     <meta name="author" content="Film Vault Gazette">
+    <link rel="canonical" href="https://filmvaultgazette.com/">
+    <script>
+      if (window.location.pathname.endsWith("index.html")) {
+        window.location.replace("/");
+      }
+    </script>
     <!--Favicon-->
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -24,25 +30,7 @@
     <meta property="og:image:height" content="621" />
     <meta property="og:title" content="Film Vault Gazette">
     <meta property="og:description" content="Discover the captivating world of film photography through monthly curated collections of talented Instagram artists. Their stories, film and analog cameras they wield, all brought together in one place."/>
-    <!--(gtag.js)-->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-9JET0VYD3C"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-9JET0VYD3C');
-    </script>
-    <script>
-      (function(h,o,t,j,a,r){
-          h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-          h._hjSettings={hjid:5041979,hjsv:6};
-          a=o.getElementsByTagName('head')[0];
-          r=o.createElement('script');r.async=1;
-          r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
-          a.appendChild(r);
-      })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
-    </script>
+    <!-- Google Analytics (conditionally injected) -->
     <!--Google Fonts-->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -61,7 +49,7 @@
             <span class="toggler-icon middle-bar"></span>
             <span class="toggler-icon bottom-bar"></span>
           </button>
-          <a class="navbar-brand" href="index.html">
+          <a class="navbar-brand" href="/">
             <img src="/assets/logo.jpg" alt="Film Vault Gazette logo" width="75" class="d-inline-block align-text-top">
           </a>
           <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
@@ -100,12 +88,12 @@
         <div class="container">
           <h2 class="h2 mt-4 pb-3">Recent Collection</h2>
           <div class="row mt-4 align-items-center">
-            <a href="collections/2025/january-2025.html" class="card-link">
+            <a href="collections/2025/february-2025.html" class="card-link">
               <div class="col-md mb-5 text-center">
                 <div class="card card-whole">
-                  <img src="/images/2025/january-2025/jan25-4.jpg" class="card-img-top" alt="">
+                  <img src="/images/2025/february-2025/feb25-5.jpg" class="card-img-top" alt="">
                   <div class="card-body">
-                    <h3 class="card-title"><b>January Collection</b></h3>
+                    <h3 class="card-title"><b>February Collection</b></h3>
                     <p class="card-text">2025</p>
                   </div>
                 </div>
@@ -118,6 +106,15 @@
         </div>
       </section>
     </main>
+
+    <!--Cookie banner-->
+    <div id="cookie-banner" class="cookie-banner">
+      <p class="cookie-text">We use <a href="/privacy.html" class="cookie-link">Cookies</a> to enhance your experience. By accepting, you allow tracking. You can reject non-essential cookies.</p>
+      <div class="cookie-buttons">
+        <button id="accept-cookies" class="cookie-btn accept-btn" aria-label="Accept all cookies and enable tracking">Accept All Cookies</button>
+        <button id="reject-cookies" class="cookie-btn reject-btn" aria-label="Reject non-essential cookies and disable tracking">Reject Non-Essential</button>
+      </div>
+    </div>
 
     <footer class="p-5 bg-dark text-light footer-dark">
       <div class="container">
@@ -139,7 +136,9 @@
             <div>
               <a class="footer-text" href="accessibility.html">Accessibility Policy</a><br>
               <a class="footer-text" href="terms.html">Terms &#38; Conditions</a><br>
+              <a class="footer-text" href="privacy.html">Privacy Policy</a><br>
               <a class="footer-text" href="https://icons8.com" target="_blank">Icons by Icons8</a><br>
+              <button id="manage-cookies-btn" class="cookie-btn-manage">Manage Cookies</button>
             </div>
           </div>
           <p class="copyright">Copyright &#169; 2025 Film Vault Gazette</p>
@@ -149,5 +148,10 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script src="index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script>emailjs.init("LwJGbn2MCz-gaWOZr");</script>
   </body>
 </html>

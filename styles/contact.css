@@ -7,7 +7,7 @@
 
 body {
   height: 1400px;  
-  padding-top: 70px;
+  padding-top: 40px;
 }
 
 a {
@@ -151,9 +151,6 @@ p {
 
 
 
-
-
-
 /* Contact Form */
 .contact-form-container {
   background: transparent;
@@ -178,8 +175,11 @@ p {
 
 /* Input Focus Effect */
 .contact-form .form-control:focus {
-  border-color: white;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.965);
+  outline: none !important;
+  border-color: white !important;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.965) !important;
+  background-color: transparent !important;
+  color: white !important;
 }
 
 /* Checkbox Styling */
@@ -194,6 +194,17 @@ p {
   height: 18px;
   accent-color: white;
   cursor: pointer;
+}
+
+.form-check-input:checked {
+  background-color: rgb(0, 0, 0) !important;
+  border-color: rgb(0, 0, 0) !important;
+}
+
+.form-check-input:focus {
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.8) !important;
+  border-color: white !important;
+  outline: 2px solid white !important;
 }
 
 .form-check-label {
@@ -245,12 +256,6 @@ p {
     padding: 20px;
   }
 }
-
-
-
-
-
-
 
 
 
